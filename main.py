@@ -1,6 +1,8 @@
 import os
 from tkinter import *
 from tkinter import filedialog
+import zipfile
+from send2trash import send2trash
 
 gui_win = Tk()
 gui_win.title('Episode-Subtitle Matcher')
@@ -12,7 +14,28 @@ label = StringVar()
 errorLabel = StringVar()
 
 
-def directory():
+def unzip():
+    path = filedialog.askopenfilename(title="Select The Zip Folder")
+    if path == '':
+        return
+    parentPath = os.path.abspath(os.path.join(path, os.pardir))
+    with zipfile.ZipFile(path, 'r') as zip_ref:
+        zip_ref.extractall(parentPath)
+
+
+def deleteSubtitles():
+    path = filedialog.askdirectory(title="Select The Folder")
+    if path == '':
+        return
+    entries = os.listdir(path)
+    for entry in entries:
+        if entry.endswith('.srt') or entry.endswith('.ass'):
+            temp = path + '\\' + entry
+            path_to_delete = temp.replace("/", "\\")
+            send2trash(path_to_delete)
+
+
+def mainFunction():
     path = filedialog.askdirectory(title="Select The Folder")
     if path == '':
         return
@@ -62,7 +85,16 @@ def directory():
         error_label.config(fg='red')
 
 
-dialog_btn = Button(gui_win, text='select a folder', command=directory, width=15, height=2)
+menu = Menu(gui_win)
+gui_win.config(menu=menu)
+fileMenu = Menu(menu)
+menu.add_cascade(label='Extra', menu=fileMenu)
+fileMenu.add_command(label='Unzip a file', command=unzip)
+fileMenu.add_command(label='Delete all subtitles', command=deleteSubtitles)
+fileMenu.add_separator()
+fileMenu.add_command(label='Exit', command=gui_win.quit)
+
+dialog_btn = Button(gui_win, text='select a folder', command=mainFunction, width=15, height=2)
 dialog_btn.pack(pady=20)
 
 label_path = Label(gui_win, textvariable=label, font='italic 8', wraplength=350, justify=CENTER)
