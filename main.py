@@ -42,11 +42,12 @@ def mainFunction():
     label.set(path)
     entries = os.listdir(path)
 
-    videoTypes = ['.mkv', '.mp4']
+    videoTypes = ['.mkv', '.mp4', '.avi']
     episodeType = ''
     episodesNames = []
     numberOfEpisodes = 0
 
+    numberOfSubtitles = 0
     subtitleIndex = 0
     subtitleTypes = ['.srt', '.ass']
     subtitleType = ''
@@ -56,11 +57,17 @@ def mainFunction():
             if any(x in entry for x in videoTypes):
                 numberOfEpisodes += 1
                 episodesNames.append(entry)
+            elif any(x in entry for x in subtitleTypes):
+                numberOfSubtitles += 1
+        if numberOfSubtitles != numberOfEpisodes:
+            raise Exception
 
         if episodesNames[0].endswith('.mkv'):
             episodeType = '.mkv'
         elif episodesNames[0].endswith('.mp4'):
             episodeType = '.mp4'
+        elif episodesNames[0].endswith('.avi'):
+            episodeType = '.avi'
 
         for entry in entries:
             if any(x in entry for x in subtitleTypes):
